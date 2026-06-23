@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllBlogPosts } from "@/lib/sanity/data";
+import { imageUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "بلاگ | نورا",
@@ -39,7 +40,7 @@ export default async function BlogPage() {
         >
           <div className="relative aspect-[16/10] md:aspect-auto">
             <Image
-              src={lead.coverImage.asset.url}
+              src={imageUrl(lead.coverImage)}
               alt={lead.coverImage.alt || lead.title}
               fill
               sizes="(max-width: 768px) 100vw, 640px"
@@ -71,7 +72,7 @@ export default async function BlogPage() {
           >
             <div className="relative aspect-[3/2] overflow-hidden">
               <Image
-                src={post.coverImage.asset.url}
+                src={imageUrl(post.coverImage)}
                 alt={post.coverImage.alt || post.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 400px"

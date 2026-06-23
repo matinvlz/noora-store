@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 
 import { getBlogPost, getAllBlogPosts } from "@/lib/sanity/data";
+import { imageUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -61,7 +62,7 @@ export default async function BlogPostPage({
 
         <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-card">
           <Image
-            src={post.coverImage.asset.url}
+            src={imageUrl(post.coverImage)}
             alt={post.coverImage.alt || post.title}
             fill
             priority

@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useCart } from "@/lib/store/cart";
-import { formatToman } from "@/lib/utils";
+import { formatToman, imageUrl } from "@/lib/utils";
 
 export default function WishlistSheet() {
   const isOpen = useWishlist((s) => s.isOpen);
@@ -56,7 +56,7 @@ export default function WishlistSheet() {
                 >
                   <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-lightgray">
                     <Image
-                      src={product.image.asset.url}
+                      src={imageUrl(product.image)}
                       alt={product.image.alt || product.name}
                       fill
                       sizes="64px"

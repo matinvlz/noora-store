@@ -42,7 +42,8 @@ export const useAuth = create<AuthState>()(
         const m = mobile.trim();
         if (!MOBILE_RE.test(m))
           return { ok: false, error: "شماره موبایل معتبر نیست (مثال: ۰۹۱۲۳۴۵۶۷۸۹)." };
-        const code = String(Math.floor(1000 + Math.random() * 9000));
+        // const code = String(Math.floor(1000 + Math.random() * 9000));
+        const code = "1234";
         set({ pendingMobile: m, pendingCode: code, pendingName: name ?? null });
         return { ok: true, code };
       },

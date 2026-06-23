@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Star } from "lucide-react";
 import type { Testimonial } from "@/types";
+import { imageUrl } from "@/lib/utils";
 import { AnimatedSection, AnimatedItem } from "./AnimatedSection";
 
 interface TestimonialsProps {
@@ -49,7 +50,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                   {t.authorAvatar && (
                     <div className="relative h-10 w-10 overflow-hidden rounded-full bg-lightgray">
                       <Image
-                        src={t.authorAvatar.asset.url}
+                        src={imageUrl(t.authorAvatar)}
                         alt={t.authorName}
                         fill
                         sizes="40px"

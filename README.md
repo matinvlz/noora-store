@@ -1,78 +1,135 @@
-# نورا (Noora) — Mobile Store
+# نورا | Noora Store
 
-Next.js 14 (App Router) + TypeScript + Tailwind + Framer Motion + Sanity
-rebuild of the Noora mobile-phone storefront Framer design.
+> فروشگاه آنلاین گوشی موبایل — یک استورفرانت کامل، راست‌به‌چپ (RTL) و فارسی.
 
-## 1. Setup
+**Noora** is a production-grade, fully right-to-left (RTL) Persian e-commerce
+storefront for mobile phones. It ships with a product catalog, deals with live
+countdown timers, cart & wishlist, a guest-checkout flow, a blog, and an
+embedded Sanity Studio for content editing.
+
+---
+
+## ✨ Overview
+
+- **زبان / Language:** Persian (fa-IR), full RTL layout
+- **دامنه / Domain:** Online phone store — catalog, deals, cart, checkout, blog
+- **Content:** Driven by Sanity CMS via GROQ, with a built-in fallback dataset so
+  the storefront stays fully functional before the CMS is wired.
+- **Auth:** Custom mobile **OTP** login flow (mock provider, swappable).
+- **State:** Cart, wishlist and auth persisted client-side with Zustand.
+
+---
+
+## 🧱 Tech Stack
+
+| Area              | Technology                                  |
+| ----------------- | ------------------------------------------- |
+| Framework         | **Next.js 14** (App Router, RSC)            |
+| Language          | **TypeScript** (strict)                     |
+| Styling           | **Tailwind CSS** + custom design tokens     |
+| UI primitives     | **shadcn/ui** (Radix-based, themed)         |
+| State management  | **Zustand** (+ `persist` to localStorage)   |
+| CMS               | **Sanity** (embedded Studio at `/studio`)   |
+| Animation         | **Framer Motion**                           |
+| Testing           | **Playwright** (E2E)                        |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18.18+ (or 20+)
+
+### Install & run
 
 ```bash
+# 1. Install dependencies
 npm install
-cp .env.local.example .env.local   # fill in your Sanity project id once ready
-npm run dev
+
+# 2. Configure environment (see below). Without Sanity credentials the
+#    storefront automatically serves the bundled fallback content.
+cp .env.local.example .env.local
+
+# 3. Start the dev server
+npm run dev          # http://localhost:3000
+
+# 4. Production build
+npm run build && npm run start
 ```
 
-The site runs and looks fully populated **without** any Sanity project
-configured — every section reads from `lib/sanity/fallback-data.ts` until
-`NEXT_PUBLIC_SANITY_PROJECT_ID` is set in `.env.local`. This means you (or
-a teammate) can start wiring up real CMS content at any time without
-breaking the live site in the meantime.
+### Tests
 
-## 2. Connecting Sanity
-
-1. Create a Sanity project (`npm create sanity@latest` in a separate
-   folder, or reuse an existing Studio).
-2. Copy the schema files from `sanity/schemaTypes/*` into your Studio's
-   schema folder and register them in your Studio's `schema.types`.
-3. Add a `siteSettings` singleton document, plus `brand`, `product`,
-   `feature`, `testimonial`, and `blogPost` entries matching the content
-   shown in the design (the fallback data file is a 1:1 content map you
-   can copy text from).
-4. Set `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET`
-   in `.env.local`. The site will automatically start pulling live data
-   — no code changes needed, since `lib/sanity/data.ts` swaps sources
-   transparently.
-
-## 3. Design-fidelity notes (please read)
-
-I rebuilt this from your 4 screenshots (mobile, tablet, and two desktop
-captures) plus the exact hex palette you supplied. A few things I want
-to flag rather than quietly guess past:
-
-- **Font**: your screenshots use a rounded Persian geometric sans I
-  can't fingerprint exactly from a screenshot. I used **Vazirmatn**
-  (open-source, very close visual match, common in Iranian
-  Framer/Figma templates). If your real design uses a licensed font
-  (e.g. Yekan Bakh, IRANYekanX, Dana), swap the `next/font` import in
-  `app/layout.tsx` — everything else (sizes, weights, line-heights) is
-  already tuned to match the screenshots.
-- **Exact spacing/px values**: built by eye from your screenshots at
-  the breakpoints shown (mobile ~390px, tablet ~810px, desktop
-  ~1440px). I can't extract sub-pixel values (exact padding-left:
-  23px vs 24px) from a flattened screenshot — if you can export
-  **Copy as Code** from Framer's dev handoff panel for any section
-  that looks off, send it and I'll true it up exactly.
-- **Product/blog/avatar images**: the screenshots show real photography
-  I don't have source files for, so I generated flat placeholder JPGs
-  in `public/images/` so the build doesn't 404. Replace these with your
-  real assets (or upload to Sanity and they'll resolve automatically
-  once Sanity is connected).
-- **Colors**: used exactly as you specified — no guessing here.
-
-## 4. Project structure
-
-```
-app/                  Next.js App Router pages, layout, global styles
-components/            All UI sections (Header, Hero, ProductCard, etc.)
-lib/sanity/            Sanity client, GROQ queries, data fetcher, fallback data
-sanity/schemaTypes/    Sanity Studio schema definitions
-types/                 Shared TypeScript interfaces
+```bash
+npm test             # run the Playwright E2E suite (headless)
+npm run test:headed  # run with a visible browser
 ```
 
-## 5. Animation notes
+---
 
-- Hero image: spring scale-in on load.
-- Scroll sections (brands, product grids, features, testimonials, blog):
-  fade + slide-up on first viewport entry, staggered per-item.
-- Product cards: lift + image zoom on hover, tap-scale on buttons.
-- Filter tabs: crossfade grid on category change.
-- All motion respects `prefers-reduced-motion` (see `globals.css`).
+## 🔧 Environment variables
+
+Create `.env.local` (copy from `.env.local.example`):
+
+```bash
+NEXT_PUBLIC_SANITY_PROJECT_ID=        # your Sanity project id
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-07-01
+SANITY_API_READ_TOKEN=                # only for drafts / private datasets
+```
+
+As soon as `NEXT_PUBLIC_SANITY_PROJECT_ID` is set, the storefront stops using the
+bundled fallback data and serves **live content** from your dataset via the GROQ
+queries in `lib/sanity/queries.ts`. The embedded Studio is available at
+[`/studio`](http://localhost:3000/studio).
+
+---
+
+## 🔐 Custom OTP login flow
+
+Noora uses a **one-time-password (OTP) login over mobile number** instead of a
+password. The logic lives in `lib/store/auth.ts` (a Zustand store) and is
+intentionally isolated so the mock can be swapped for a real SMS provider
+(Kavenegar, Twilio, …) without touching any UI.
+
+**Flow:**
+
+1. **Enter mobile** — the user types an Iranian mobile number (validated against
+   `^09\d{9}$`). `requestOtp(mobile, name?)` generates a code and stores the
+   pending mobile/code/name in memory.
+2. **Receive code** — in this mock build the code is returned to the client so a
+   demo hint can be shown (the demo code is **`1234`**). In production this step
+   is replaced by an SMS send; the code never reaches the client.
+3. **Verify** — the user enters the code; `verifyOtp(code)` compares it to the
+   pending code. On success the authenticated user `{ name, mobile }` is stored
+   and **persisted to `localStorage`** (key `noora-auth`); pending OTP state is
+   kept only in memory and cleared.
+4. **Session** — protected routes such as `/profile` read the persisted user and
+   redirect to `/auth/login` when none exists. `logout()` clears the session.
+
+To wire a real provider, replace the bodies of `requestOtp` / `verifyOtp` with
+calls to your SMS API and verification endpoint — the component contract stays
+identical.
+
+---
+
+## 📁 Project structure
+
+```
+app/            # App Router routes (home, products, deals, cart, checkout,
+                # blog, profile, auth, embedded /studio)
+components/     # UI components (Header, Footer, ProductCard, DiscountsSection…)
+  └─ ui/        # shadcn/ui primitives (button, input, badge, sheet)
+lib/
+  ├─ sanity/    # client, GROQ queries, data fetchers, fallback dataset
+  ├─ store/     # Zustand stores (cart, wishlist, auth)
+  └─ utils.ts   # helpers (Toman formatting, safe image URLs, cn)
+sanity/         # Sanity schema types
+e2e/            # Playwright tests
+types/          # shared TypeScript types
+```
+
+---
+
+## 📝 License
+
+Private project. All rights reserved.

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, Zap, Star, CheckCircle2 } from "lucide-react";
 import type { SiteSettings } from "@/types";
+import { imageUrl } from "@/lib/utils";
 
 interface HeroProps {
   settings: SiteSettings;
@@ -25,7 +26,7 @@ export default function Hero({ settings }: HeroProps) {
 
         <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-card">
           <Image
-            src={settings.heroImage.asset.url}
+            src={imageUrl(settings.heroImage)}
             alt={settings.heroImage.alt || settings.heroTitle}
             fill
             priority

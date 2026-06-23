@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { BlogPost } from "@/types";
+import { imageUrl } from "@/lib/utils";
 import { AnimatedSection, AnimatedItem } from "./AnimatedSection";
 
 interface BlogSectionProps {
@@ -43,7 +44,7 @@ export default function BlogSection({ posts }: BlogSectionProps) {
               <article className="group h-full overflow-hidden rounded-card bg-surface shadow-soft transition-all hover:-translate-y-1 hover:shadow-card-hover">
                 <div className="relative aspect-[3/2] overflow-hidden">
                   <Image
-                    src={post.coverImage.asset.url}
+                    src={imageUrl(post.coverImage)}
                     alt={post.coverImage.alt || post.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 400px"

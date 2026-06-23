@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useCart, selectCount, selectSubtotal } from "@/lib/store/cart";
 import { useAuth } from "@/lib/store/auth";
-import { formatToman } from "@/lib/utils";
+import { formatToman, imageUrl } from "@/lib/utils";
 
 export default function CartSheet() {
   const router = useRouter();
@@ -72,7 +72,7 @@ export default function CartSheet() {
                   >
                     <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-lg bg-lightgray">
                       <Image
-                        src={line.product.image.asset.url}
+                        src={imageUrl(line.product.image)}
                         alt={line.product.image.alt || line.product.name}
                         fill
                         sizes="64px"

@@ -2,184 +2,143 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Flame, ShoppingCart, Heart, Zap } from "lucide-react";
+import { ShoppingCart, Heart, ArrowLeft } from "lucide-react";
 import type { Product } from "@/types";
 
 import Countdown from "./Countdown";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
-import { cn, formatToman, discountPercent } from "@/lib/utils";
+import { cn, formatToman, discountPercent, imageUrl } from "@/lib/utils";
 
 interface DiscountsSectionProps {
   deals: Product[];
 }
 
-export default function DiscountsSection({ deals }: DiscountsSectionProps) {
+/** Sleek angular discount badge — sharp top-left clip, no gradients. */
+function DealBadge({ off }: { off: number }) {
+  if (off <= 0) return null;
+  return (
+    <span
+      className="absolute right-0 top-3 z-10 flex items-baseline gap-0.5 bg-coral px-2.5 py-1 text-white shadow-soft"
+      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}
+    >
+      <span className="text-[15px] font-extrabold leading-none">٪{formatToman(off)}</span>
+      <span className="text-[10px] font-medium leading-none opacity-90">تخفیف</span>
+    </span>
+  );
+}
+
+function DealCard({ deal, index }: { deal: Product; index: number }) {
   const addToCart = useCart((s) => s.add);
   const toggleWishlist = useWishlist((s) => s.toggle);
+  const off = discountPercent(deal.price, deal.originalPrice);
 
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.3) }}
+      className="group relative flex flex-col overflow-hidden rounded-card border border-hairline bg-surface transition-shadow hover:shadow-card-hover"
+    >
+      <div className="relative aspect-square overflow-hidden bg-lightgray">
+        <DealBadge off={off} />
+        <button
+          aria-label="افزودن به علاقه‌مندی‌ها"
+          onClick={() => toggleWishlist(deal)}
+          className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface/80 text-navy backdrop-blur-sm transition-colors hover:bg-coral hover:text-white"
+        >
+          <Heart size={15} />
+        </button>
+        <Image
+          src={imageUrl(deal.image)}
+          alt={deal.image.alt || deal.name}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <p className="text-[11px] font-medium tracking-wide text-body">{deal.brand.name}</p>
+        <h3 className="mt-1 line-clamp-1 text-sm font-bold text-navy">{deal.name}</h3>
+
+        <div className="mt-3 flex items-baseline justify-between">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-lg font-extrabold tracking-tight text-navy">
+              {formatToman(deal.price)}
+            </span>
+            <span className="text-[11px] text-body">تومان</span>
+          </div>
+          {deal.originalPrice && (
+            <span className="price-strike">{formatToman(deal.originalPrice)}</span>
+          )}
+        </div>
+
+        {deal.dealEndsAt && (
+          <div className="mt-3 border-t border-hairline pt-3">
+            <Countdown endsAt={deal.dealEndsAt} compact className="justify-center" />
+          </div>
+        )}
+
+        <Button
+          variant="coral"
+          onClick={() => addToCart(deal)}
+          disabled={deal.stock <= 0}
+          className="mt-3 w-full"
+        >
+          <ShoppingCart size={15} />
+          {deal.stock > 0 ? "خرید با تخفیف" : "ناموجود"}
+        </Button>
+      </div>
+    </motion.article>
+  );
+}
+
+export default function DiscountsSection({ deals }: DiscountsSectionProps) {
   if (!deals.length) return null;
-
-  const [featured, ...rest] = deals;
-  const featuredOff = discountPercent(featured.price, featured.originalPrice);
 
   return (
     <section id="deals" className="py-16">
       <div className="container-page">
         {/* Header */}
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex items-end justify-between gap-4 border-b border-hairline pb-5">
           <div>
-            <p className="eyebrow flex items-center gap-1.5">
-              <Flame size={15} className="text-coral" />
+            <span className="inline-flex items-center gap-1.5 rounded-pill bg-coral/10 px-3 py-1 text-xs font-bold text-coral">
+              <span className="h-1.5 w-1.5 rounded-full bg-coral" />
               پیشنهاد شگفت‌انگیز
-            </p>
-            <h2 className="mt-1.5 text-2xl font-bold text-navy sm:text-3xl">
-              تخفیف‌ها و فرصت‌های ویژه
+            </span>
+            <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-navy sm:text-3xl">
+              فرصت‌های ویژه خرید
             </h2>
           </div>
           <a
             href="/deals"
-            className="text-sm font-semibold text-teal transition-colors hover:text-teal/80"
+            className={cn(
+              "group hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-teal",
+              "transition-colors hover:text-teal/80 sm:flex"
+            )}
           >
-            همه تخفیف‌ها ←
+            مشاهده همه
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
           </a>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-3">
-          {/* Featured deal — asymmetric hero card */}
-          <motion.article
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            className="relative overflow-hidden rounded-card bg-gradient-to-br from-navy via-charcoal to-navy p-6 text-white shadow-card lg:col-span-2 lg:p-8"
-          >
-            {/* glow */}
-            <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-coral/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-20 right-10 h-56 w-56 rounded-full bg-teal/20 blur-3xl" />
-
-            <div className="relative grid items-center gap-6 sm:grid-cols-2">
-              <div className="relative mx-auto aspect-[4/5] w-full max-w-[14rem] overflow-hidden rounded-2xl">
-                <Image
-                  src={featured.image.asset.url}
-                  alt={featured.image.alt || featured.name}
-                  fill
-                  sizes="240px"
-                  className="object-cover"
-                />
-                {featuredOff > 0 && (
-                  <span className="absolute right-3 top-3 rounded-pill bg-coral px-3 py-1.5 text-sm font-extrabold">
-                    ٪{formatToman(featuredOff)}- تخفیف
-                  </span>
-                )}
-              </div>
-
-              <div className="text-right">
-                <p className="text-sm text-white/70">{featured.brand.name}</p>
-                <h3 className="mt-1 text-2xl font-extrabold leading-tight">
-                  {featured.name}
-                </h3>
-
-                <div className="mt-3 flex items-baseline justify-end gap-2">
-                  {featured.originalPrice && (
-                    <span className="text-sm text-white/50 line-through">
-                      {formatToman(featured.originalPrice)}
-                    </span>
-                  )}
-                  <span className="text-2xl font-extrabold text-coral">
-                    {formatToman(featured.price)}
-                  </span>
-                  <span className="text-xs text-white/70">تومان</span>
-                </div>
-
-                <p className="mt-4 text-xs text-white/70">پایان فرصت تا:</p>
-                <Countdown endsAt={featured.dealEndsAt!} className="mt-2 justify-end" />
-
-                <div className="mt-5 flex flex-wrap justify-end gap-2">
-                  <Button
-                    variant="coral"
-                    onClick={() => addToCart(featured)}
-                    disabled={featured.stock <= 0}
-                  >
-                    <ShoppingCart size={16} />
-                    {featured.stock > 0 ? "خرید با تخفیف" : "ناموجود"}
-                  </Button>
-                  <button
-                    aria-label="افزودن به علاقه‌مندی‌ها"
-                    onClick={() => toggleWishlist(featured)}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:bg-white/10"
-                  >
-                    <Heart size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.article>
-
-          {/* Side column — compact deal rows */}
-          <div className="flex flex-col gap-4">
-            {rest.slice(0, 3).map((deal) => {
-              const off = discountPercent(deal.price, deal.originalPrice);
-              return (
-                <motion.article
-                  key={deal._id}
-                  initial={{ opacity: 0, x: 24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  className="flex gap-3 rounded-card bg-surface p-3 shadow-soft transition-shadow hover:shadow-card-hover"
-                >
-                  <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-lightgray">
-                    <Image
-                      src={deal.image.asset.url}
-                      alt={deal.image.alt || deal.name}
-                      fill
-                      sizes="80px"
-                      className="object-cover"
-                    />
-                    {off > 0 && (
-                      <Badge
-                        variant="coral"
-                        className="absolute right-1 top-1 px-1.5"
-                      >
-                        ٪{formatToman(off)}-
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col">
-                    <p className="text-[11px] text-body">{deal.brand.name}</p>
-                    <h4 className="text-sm font-bold text-navy">{deal.name}</h4>
-                    <div className="mt-0.5 flex items-baseline gap-1.5">
-                      <span className="text-sm font-extrabold text-navy">
-                        {formatToman(deal.price)}
-                      </span>
-                      {deal.originalPrice && (
-                        <span className="price-strike">
-                          {formatToman(deal.originalPrice)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-auto flex items-center justify-between gap-2 pt-1.5">
-                      <Countdown endsAt={deal.dealEndsAt!} compact />
-                      <button
-                        aria-label="افزودن به سبد"
-                        onClick={() => addToCart(deal)}
-                        disabled={deal.stock <= 0}
-                        className={cn(
-                          "flex h-8 w-8 items-center justify-center rounded-full bg-navy text-white transition-colors hover:bg-charcoal",
-                          deal.stock <= 0 && "opacity-40"
-                        )}
-                      >
-                        <Zap size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.article>
-              );
-            })}
-          </div>
+        {/* Minimal uniform deal grid */}
+        <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {deals.slice(0, 4).map((deal, i) => (
+            <DealCard key={deal._id} deal={deal} index={i} />
+          ))}
         </div>
+
+        <a
+          href="/deals"
+          className="mt-8 flex items-center justify-center gap-1.5 text-sm font-semibold text-teal transition-colors hover:text-teal/80 sm:hidden"
+        >
+          مشاهده همه تخفیف‌ها
+          <ArrowLeft size={16} />
+        </a>
       </div>
     </section>
   );

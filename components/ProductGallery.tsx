@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SanityImage } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn, imageUrl } from "@/lib/utils";
 
 interface ProductGalleryProps {
   images: SanityImage[];
@@ -38,7 +38,7 @@ export default function ProductGallery({
               className="absolute inset-0"
             >
               <Image
-                src={current.asset.url}
+                src={imageUrl(current)}
                 alt={current.alt || name}
                 fill
                 priority
@@ -63,7 +63,7 @@ export default function ProductGallery({
               )}
             >
               <Image
-                src={shot.asset.url}
+                src={imageUrl(shot)}
                 alt={shot.alt || name}
                 fill
                 sizes="64px"

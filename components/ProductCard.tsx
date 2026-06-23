@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useHydrated } from "@/lib/use-hydrated";
-import { cn, formatToman, discountPercent } from "@/lib/utils";
+import { cn, formatToman, discountPercent, imageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -52,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         <Image
-          src={product.image.asset.url}
+          src={imageUrl(product.image)}
           alt={product.image.alt || product.name}
           fill
           sizes="(max-width: 768px) 50vw, 220px"

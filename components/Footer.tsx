@@ -16,7 +16,7 @@ const CUSTOMER_SERVICE = [
 
 export default function Footer() {
   return (
-    <footer className="bg-navy pt-14 pb-6 text-white">
+    <footer className="mt-auto bg-navy pt-14 pb-6 text-white">
       <div className="container-page grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
         <div>

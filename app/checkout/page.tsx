@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/store/auth";
 import { useCart, selectSubtotal } from "@/lib/store/cart";
 import { useHydrated } from "@/lib/use-hydrated";
-import { formatToman } from "@/lib/utils";
+import { formatToman, imageUrl } from "@/lib/utils";
 
 type Status = "form" | "processing" | "success";
 
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
                 <li key={line.product._id} className="flex items-center gap-3">
                   <div className="relative h-14 w-12 shrink-0 overflow-hidden rounded-lg bg-lightgray">
                     <Image
-                      src={line.product.image.asset.url}
+                      src={imageUrl(line.product.image)}
                       alt={line.product.image.alt || line.product.name}
                       fill
                       sizes="48px"
