@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-offwhite text-body antialiased;
+    font-feature-settings: "ss01" on;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-navy;
+  }
+
+  /* Respect reduced-motion preferences globally */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Visible keyboard focus ring everywhere */
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-teal;
+  }
+}
+
+@layer utilities {
+  .container-page {
+    @apply mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply text-sm font-medium text-teal;
+  }
+
+  .price-strike {
+    @apply text-body/60 line-through text-xs;
+  }
+}
