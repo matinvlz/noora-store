@@ -8,9 +8,10 @@ export const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "placeholder",
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-07-01",
-  // Use the CDN in production for fast, cached reads. Disable for
-  // preview/draft contexts where you need the freshest data.
-  useCdn: process.env.NODE_ENV === "production",
+  // Always read through the CDN: it serves cached, public, edge-distributed
+  // reads and sidesteps the stricter rate/network restrictions of the
+  // uncached live API. A read token (when set) is still honored by the CDN.
+  useCdn: true,
   token: process.env.SANITY_API_READ_TOKEN,
   perspective: "published",
 });

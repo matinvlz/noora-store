@@ -32,22 +32,43 @@ import type {
 
 const isSanityConfigured = Boolean(process.env.NEXT_PUBLIC_SANITY_PROJECT_ID);
 
+// Only warn once per process so an unreachable/empty dataset (e.g. a brand-new
+// project, a private dataset without a read token, or a 403) doesn't flood the
+// build/server logs. The storefront keeps working on fallback data regardless.
+let warnedAboutFetch = false;
+function warnOnce(reason: string) {
+  if (warnedAboutFetch) return;
+  warnedAboutFetch = true;
+  console.warn(
+    `[sanity] Live content unavailable (${reason}). Serving bundled fallback ` +
+      `data. Set NEXT_PUBLIC_SANITY_PROJECT_ID and, for private datasets, ` +
+      `SANITY_API_READ_TOKEN to enable live reads.`
+  );
+}
+
 /**
- * Generic safe-fetch wrapper: tries Sanity first, falls back to mock
- * data if Sanity isn't configured yet or the request fails. This keeps
- * the storefront fully functional during initial development and
- * content migration.
+ * Generic safe-fetch wrapper: tries Sanity first, falls back to bundled mock
+ * data when Sanity isn't configured yet, the dataset is empty/freshly seeded,
+ * or the request fails (network error, 403 on a private dataset, etc.). This
+ * keeps the storefront fully functional and never lets a CMS hiccup crash or
+ * block a page render.
  */
 async function safeFetch<T>(query: string, fallback: T): Promise<T> {
   if (!isSanityConfigured) return fallback;
   try {
     const result = await sanityClient.fetch<T>(query);
-    if (!result || (Array.isArray(result) && result.length === 0)) {
+    // Treat an empty array or null/undefined as "not seeded yet" → fallback.
+    if (
+      result == null ||
+      (Array.isArray(result) && result.length === 0)
+    ) {
       return fallback;
     }
     return result;
   } catch (error) {
-    console.error("Sanity fetch failed, using fallback data:", error);
+    const status =
+      (error as { statusCode?: number })?.statusCode ?? "network error";
+    warnOnce(`HTTP ${status}`);
     return fallback;
   }
 }
@@ -71,7 +92,9 @@ export async function getProduct(slug: string): Promise<Product | null> {
     );
     return result ?? fallback;
   } catch (error) {
-    console.error("Sanity fetch failed, using fallback data:", error);
+    const status =
+      (error as { statusCode?: number })?.statusCode ?? "network error";
+    warnOnce(`HTTP ${status}`);
     return fallback;
   }
 }
@@ -119,7 +142,9 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
     );
     return result ?? fallback;
   } catch (error) {
-    console.error("Sanity fetch failed, using fallback data:", error);
+    const status =
+      (error as { statusCode?: number })?.statusCode ?? "network error";
+    warnOnce(`HTTP ${status}`);
     return fallback;
   }
 }

@@ -46,14 +46,19 @@ export default function ProfilePage() {
   const stats = [
     { icon: ShoppingCart, label: "سبد خرید", value: cartCount, onClick: openCart },
     { icon: Heart, label: "علاقه‌مندی‌ها", value: wishCount, onClick: openWishlist },
-    { icon: Package, label: "سفارش‌ها", value: 0 },
+    {
+      icon: Package,
+      label: "سفارش‌ها",
+      value: 0,
+      onClick: () => router.push("/profile/orders"),
+    },
   ];
 
   const menu = [
-    { icon: Package, label: "سفارش‌های من", desc: "پیگیری و تاریخچه خرید", href: "/orders" },
-    { icon: MapPin, label: "آدرس‌ها", desc: "مدیریت نشانی‌های ارسال", href: "/profile" },
-    { icon: ShieldCheck, label: "ضمانت‌نامه‌ها", desc: "گارانتی کالاهای خریداری‌شده", href: "/warranty" },
-    { icon: Headphones, label: "پشتیبانی", desc: "تماس با تیم نورا", href: "/contact" },
+    { icon: Package, label: "سفارش‌های من", desc: "پیگیری و تاریخچه خرید", href: "/profile/orders" },
+    { icon: MapPin, label: "آدرس‌ها", desc: "مدیریت نشانی‌های ارسال", href: "/profile/addresses" },
+    { icon: ShieldCheck, label: "ضمانت‌نامه‌ها", desc: "گارانتی کالاهای خریداری‌شده", href: "/profile/warranty" },
+    { icon: Headphones, label: "پشتیبانی", desc: "تماس با تیم نورا", href: "/profile/support" },
   ];
 
   return (

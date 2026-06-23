@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, ShoppingCart, Heart, Check, Zap } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Heart, Check } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/types";
 
@@ -15,6 +15,11 @@ export default function ProductPurchase({ product }: { product: Product }) {
   const addToCart = useCart((s) => s.add);
   const openCart = useCart((s) => s.open);
   const toggleWishlist = useWishlist((s) => s.toggle);
+
+  const handleAddToCart = () => {
+    addToCart(product, qty);
+    openCart();
+  };
   const wishlisted = useWishlist((s) =>
     s.items.some((p) => p._id === product._id)
   );
@@ -70,24 +75,13 @@ export default function ProductPurchase({ product }: { product: Product }) {
         <Button
           variant="coral"
           size="lg"
+          className="flex-1 sm:flex-none"
           disabled={outOfStock}
-          onClick={() => addToCart(product, qty)}
+          onClick={handleAddToCart}
         >
           <ShoppingCart size={18} />
-          {outOfStock ? "ناموجود" : "افزودن به سبد"}
+          {outOfStock ? "ناموجود" : "افزودن به سبد خرید"}
         </Button>
-        {!outOfStock && (
-          <Button
-            size="lg"
-            onClick={() => {
-              addToCart(product, qty);
-              openCart();
-            }}
-          >
-            <Zap size={18} />
-            خرید فوری
-          </Button>
-        )}
         <button
           aria-label="افزودن به علاقه‌مندی‌ها"
           aria-pressed={hydrated && wishlisted}
