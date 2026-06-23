@@ -1,0 +1,17 @@
+import { defineConfig } from "sanity";
+import { structureTool } from "sanity/structure";
+import { visionTool } from "@sanity/vision";
+import { schemaTypes } from "./sanity/schemaTypes";
+
+// Embedded Studio config. `projectId` falls back to "placeholder" so the build
+// succeeds before credentials exist; set NEXT_PUBLIC_SANITY_PROJECT_ID in
+// .env.local and the Studio at /studio connects to your live dataset.
+export default defineConfig({
+  name: "noora",
+  title: "نورا | مدیریت محتوا",
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "placeholder",
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
+  basePath: "/studio",
+  plugins: [structureTool(), visionTool()],
+  schema: { types: schemaTypes },
+});
