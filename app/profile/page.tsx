@@ -59,7 +59,9 @@ export default function ProfilePage() {
         </div>
         <div className="sm:flex-1">
           <h1 className="text-2xl font-extrabold">{user.name}</h1>
-          <p className="mt-1 text-sm text-white/70">{user.email}</p>
+          <p dir="ltr" className="mt-1 text-sm text-white/70 sm:text-right">
+            {user.mobile}
+          </p>
         </div>
         <Button
           variant="outline"

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, Trash2, ShoppingBag, ShoppingCart } from "lucide-react";
 
@@ -13,9 +14,12 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart, selectCount, selectSubtotal } from "@/lib/store/cart";
+import { useAuth } from "@/lib/store/auth";
 import { formatToman } from "@/lib/utils";
 
 export default function CartSheet() {
+  const router = useRouter();
+  const user = useAuth((s) => s.user);
   const isOpen = useCart((s) => s.isOpen);
   const setOpen = useCart((s) => s.setOpen);
   const items = useCart((s) => s.items);
@@ -150,7 +154,18 @@ export default function CartSheet() {
                   </span>
                 </span>
               </div>
-              <Button variant="coral" size="lg" className="w-full">
+              <Button
+                variant="coral"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  setOpen(false);
+                  // Intercept guests: send to login, then back to checkout.
+                  router.push(
+                    user ? "/checkout" : "/auth/login?redirect=/checkout"
+                  );
+                }}
+              >
                 تکمیل خرید
               </Button>
             </SheetFooter>

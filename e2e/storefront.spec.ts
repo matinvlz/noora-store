@@ -72,24 +72,61 @@ test.describe("Noora storefront", () => {
     ).toBeVisible();
   });
 
-  test("auth: header button leads to login and registering signs in", async ({
+  // Reads the demo OTP hint and submits it. Assumes the mobile step is filled.
+  async function completeOtp(page: import("@playwright/test").Page) {
+    await page.getByRole("button", { name: "ارسال کد تأیید" }).click();
+    const hint = await page.getByText(/کد دموی شما/).textContent();
+    const code = (hint?.match(/\d{4}/) ?? ["0000"])[0];
+    await page.getByPlaceholder("• • • •").fill(code);
+    await page.getByRole("button", { name: "تأیید و ورود" }).click();
+  }
+
+  test("auth: OTP login from the header lands on the profile", async ({
     page,
   }) => {
     await page.goto("/");
     await page.getByRole("link", { name: "ورود" }).first().click();
     await expect(page).toHaveURL(/\/auth\/login/);
-
-    // Go to register and create an account
-    await page.getByRole("link", { name: "ثبت‌نام کن" }).click();
-    await expect(page).toHaveURL(/\/auth\/register/);
-    await page.getByLabel("نام و نام خانوادگی").fill("نگار احمدی");
-    await page.getByLabel("ایمیل").fill("negar@example.com");
-    await page.getByLabel("رمز عبور").fill("secret123");
-    await page.getByRole("button", { name: "ثبت‌نام" }).click();
-
-    // Lands on profile, authenticated
+    await page.getByPlaceholder("09123456789").fill("09123456789");
+    await completeOtp(page);
     await expect(page).toHaveURL(/\/profile/);
-    await expect(page.getByRole("heading", { name: "نگار احمدی" })).toBeVisible();
+  });
+
+  test("auth: OTP register stores the chosen name", async ({ page }) => {
+    await page.goto("/auth/register");
+    await page.getByPlaceholder("مثلاً نگار احمدی").fill("نگار احمدی");
+    await page.getByPlaceholder("09123456789").fill("09123456789");
+    await completeOtp(page);
+    await expect(page).toHaveURL(/\/profile/);
+    await expect(
+      page.getByRole("heading", { name: "نگار احمدی" })
+    ).toBeVisible();
+  });
+
+  test("guest checkout: cart redirects to login then completes payment", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "افزودن به سبد" }).first().click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByRole("button", { name: "تکمیل خرید" }).click();
+
+    // Guest intercepted → login with return URL
+    await expect(page).toHaveURL(/\/auth\/login\?redirect=/);
+    await page.getByPlaceholder("09123456789").fill("09123456789");
+    await completeOtp(page);
+
+    // Returned to checkout
+    await expect(page).toHaveURL(/\/checkout/);
+    await page.getByLabel("شهر").fill("تهران");
+    await page.getByLabel("کد پستی").fill("1234567890");
+    await page.getByLabel("نشانی کامل").fill("خیابان ولیعصر، پلاک ۱");
+    await page.getByRole("button", { name: /پرداخت/ }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "سفارش با موفقیت ثبت شد!" })
+    ).toBeVisible();
+    await expect(page.getByText(/کد پیگیری/)).toBeVisible();
   });
 
   test("custom 404 page renders for unknown routes", async ({ page }) => {

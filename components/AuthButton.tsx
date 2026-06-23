@@ -57,7 +57,9 @@ export default function AuthButton() {
                 <p className="truncate text-sm font-bold text-navy">
                   {user.name}
                 </p>
-                <p className="truncate text-xs text-body">{user.email}</p>
+                <p dir="ltr" className="truncate text-end text-xs text-body">
+                  {user.mobile}
+                </p>
               </div>
               <Link
                 href="/profile"
