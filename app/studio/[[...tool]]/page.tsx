@@ -1,13 +1,10 @@
-"use client";
+import StudioPageClient from "./client";
 
-import nextDynamic from "next/dynamic";
-
-// The Sanity Studio is browser-only; load it with ssr:false so its React
-// context providers are never evaluated during server page-collection.
-const StudioClient = nextDynamic(() => import("@/components/StudioClient"), {
-  ssr: false,
-});
+// Required for static export: pre-render the root /studio path only
+export function generateStaticParams() {
+  return [{ tool: [] }];
+}
 
 export default function StudioPage() {
-  return <StudioClient />;
+  return <StudioPageClient />;
 }
