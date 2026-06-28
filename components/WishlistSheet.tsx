@@ -60,7 +60,7 @@ export default function WishlistSheet() {
                       alt={product.image.alt || product.name}
                       fill
                       sizes="64px"
-                      className="object-contain p-1"
+                      className="object-contain"
                     />
                   </div>
                   <div className="flex flex-1 flex-col">

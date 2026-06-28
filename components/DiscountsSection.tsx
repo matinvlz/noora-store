@@ -56,7 +56,7 @@ function DealCard({ deal, index }: { deal: Product; index: number }) {
           alt={deal.image.alt || deal.name}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
+          className="object-contain transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 

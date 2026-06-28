@@ -43,7 +43,7 @@ export default function ProductGallery({
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 520px"
-                className="object-cover"
+                className="object-contain"
               />
             </motion.div>
           )}
@@ -67,7 +67,7 @@ export default function ProductGallery({
                 alt={shot.alt || name}
                 fill
                 sizes="64px"
-                className="object-contain p-1.5"
+                className="object-contain"
               />
             </button>
           ))}
