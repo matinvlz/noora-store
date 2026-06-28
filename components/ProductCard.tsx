@@ -57,7 +57,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           fill
           sizes="(max-width: 768px) 50vw, 220px"
           className={cn(
-            "object-cover transition-transform duration-500 group-hover:scale-105",
+            "object-contain p-5 transition-transform duration-500 group-hover:scale-105",
             outOfStock && "grayscale"
           )}
         />

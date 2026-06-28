@@ -31,7 +31,7 @@ export default function Hero({ settings }: HeroProps) {
             fill
             priority
             sizes="(max-width: 1024px) 90vw, 480px"
-            className="object-cover"
+            className="object-contain p-8"
           />
         </div>
 

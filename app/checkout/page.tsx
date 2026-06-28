@@ -221,7 +221,7 @@ export default function CheckoutPage() {
                       alt={line.product.image.alt || line.product.name}
                       fill
                       sizes="48px"
-                      className="object-cover"
+                      className="object-contain p-1"
                     />
                     <span className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-navy text-[10px] font-bold text-white">
                       {formatToman(line.qty)}

@@ -76,7 +76,7 @@ export default function CartSheet() {
                         alt={line.product.image.alt || line.product.name}
                         fill
                         sizes="64px"
-                        className="object-cover"
+                        className="object-contain p-1"
                       />
                     </div>
 
